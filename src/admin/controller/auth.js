@@ -2,6 +2,7 @@ const Base = require('./base.js');
 
 module.exports = class extends Base {
   async loginAction() {
+   
     const username = this.post('username');
     const password = this.post('password');
 
@@ -16,7 +17,7 @@ module.exports = class extends Base {
 
     // 更新登录信息
     await this.model('admin').where({ id: admin.id }).update({
-      last_login_time: parseInt(Date.now() / 1000),
+      last_login_time: parseInt(Date.now()),
       last_login_ip: this.ctx.ip
     });
 

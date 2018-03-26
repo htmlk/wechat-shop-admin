@@ -8,7 +8,6 @@ module.exports = class extends Base {
    */
   async prepayAction() {
     const orderId = this.get('orderId');
-
     const orderInfo = await this.model('order').where({ id: orderId }).find();
     if (think.isEmpty(orderInfo)) {
       return this.fail(400, '订单已取消');
@@ -24,19 +23,35 @@ module.exports = class extends Base {
     console.log(openid)
     console.log(orderInfo)
     
+     
+ 
       const returnParams = await WeixinSerivce.createUnifiedOrder({
         openid: openid,
+        orderId:orderId,
         body: '订单编号：' + orderInfo.order_sn,
         out_trade_no: orderInfo.order_sn,
         total_fee: parseInt(orderInfo.actual_price * 100),
         spbill_create_ip: ''
       });
+      think.logger.info(returnParams.prepay_id)
+      var prepay_id=returnParams.prepay_id
+      await this.model('order').where({ id: orderId }).limit(1).update({ prepay_id: prepay_id });
+
        return this.success(returnParams);
-    try {  
-     
+        try {    
     } catch (err) {
       return this.fail('微信支付失败2');
     }
+  }
+  async sendmsgAction(){
+    const orderId = this.get('orderId');
+    const orderInfo = await this.model('order').where({ id: orderId }).find();
+
+      const openid = await this.model('user').where({ id: orderInfo.user_id }).getField('weixin_openid', true);
+      think.logger.info(orderInfo.prepay_id)
+      var datamsg= await this.model('order').sendmsg(openid,orderInfo);
+     think.logger.info(datamsg)
+     return this.success(datamsg);
   }
 
   async notifyAction() {

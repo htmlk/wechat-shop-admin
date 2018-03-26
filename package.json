@@ -23,6 +23,8 @@
     "think-model": "^1.0.0",
     "think-model-mysql": "^1.0.0",
     "thinkjs": "^3.0.0",
+    "wechat-card": "^1.0.8",
+    "wechat-oauth": "^1.2.1",
     "weixinpay": "^1.0.12",
     "xml2js": "^0.4.19"
   },

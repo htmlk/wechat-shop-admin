@@ -15,7 +15,7 @@ module.exports = class extends Base {
   async skuAction() {
     const goodsId = this.get('id');
     const model = this.model('goods');
-
+    
     return this.success({
       specificationList: await model.getSpecificationList(goodsId),
       productList: await model.getProductList(goodsId)
@@ -108,7 +108,7 @@ module.exports = class extends Base {
 
     const goodsQuery = this.model('goods');
 
-    const whereMap = {};
+    const whereMap = {is_on_sale: 1};
     if (!think.isEmpty(isNew)) {
       whereMap.is_new = isNew;
     }

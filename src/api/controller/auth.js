@@ -5,6 +5,8 @@ module.exports = class extends Base {
   async loginByWeixinAction() {
     const code = this.post('code');
     const fullUserInfo = this.post('userInfo');
+     const getSystemInfo = this.post('getSystemInfo');
+
     const userInfo = fullUserInfo.userInfo;
     const clientIp = ''; // 暂时不记录 ip
 
@@ -55,10 +57,16 @@ module.exports = class extends Base {
         weixin_openid: sessionData.openid,
         avatar: userInfo.avatarUrl || '',
         gender: userInfo.gender || 1, // 性别 0：未知、1：男、2：女
-        nickname: userInfo.nickName
+        nickname: userInfo.nickName,
+        weixin_system:getSystemInfo.system,
+        weixin_SDKVersion:getSystemInfo.SDKVersion,
+        weixin_brand:getSystemInfo.brand,
+        weixin_model:getSystemInfo.model,
+        weixin_version:getSystemInfo.version,
+        weixin_language:getSystemInfo.language,
+        weixin_platform:getSystemInfo.platform
       });
     }
-
     sessionData.user_id = userId;
 
     // 查询用户信息
@@ -67,7 +75,17 @@ module.exports = class extends Base {
     // 更新登录信息
     userId = await this.model('user').where({ id: userId }).update({
       last_login_time: parseInt(new Date().getTime() / 1000),
-      last_login_ip: clientIp
+      last_login_ip: clientIp,
+       avatar: userInfo.avatarUrl || '',
+        gender: userInfo.gender || 1, // 性别 0：未知、1：男、2：女
+        nickname: userInfo.nickName,
+       weixin_system:getSystemInfo.system,
+        weixin_SDKVersion:getSystemInfo.SDKVersion,
+        weixin_brand:getSystemInfo.brand,
+        weixin_model:getSystemInfo.model,
+        weixin_version:getSystemInfo.version,
+        weixin_language:getSystemInfo.language,
+        weixin_platform:getSystemInfo.platform
     });
 
     const TokenSerivce = this.service('token', 'api');

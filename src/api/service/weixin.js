@@ -63,6 +63,7 @@ module.exports = class extends think.Service {
             'timeStamp': parseInt(Date.now() / 1000) + '',
             'nonceStr': res.nonce_str,
             'package': 'prepay_id=' + res.prepay_id,
+            'prepay_id':res.prepay_id,
             'signType': 'MD5'
           };
           const paramStr = `appId=${returnParams.appid}&nonceStr=${returnParams.nonceStr}&package=${returnParams.package}&signType=${returnParams.signType}&timeStamp=${returnParams.timeStamp}&key=` + think.config('weixin.partner_key');

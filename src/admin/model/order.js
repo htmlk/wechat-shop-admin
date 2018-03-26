@@ -1,5 +1,6 @@
 const _ = require('lodash');
-
+const rp = require('request-promise');
+const moment = require('moment');
 module.exports = class extends think.Model {
   /**
    * 生成订单的编号order_sn
@@ -74,10 +75,79 @@ module.exports = class extends think.Model {
     let statusText = '未付款';
     switch (orderInfo.order_status) {
       case 0:
-        statusText = '未付款';
-        break;
+      statusText = '未付款';
+      break;
+      case 201:
+      statusText = '已付款';
+      break;
+       case 300:
+      statusText = '已经发货';
+      break;
+       case 301:
+      statusText = '已完成';
+      break;
     }
 
     return statusText;
   }
+    /**
+   *更改订单状态 
+   *
+   */
+   async updateOrderStatus(orderId, orderStatus) {
+    return this.where({id: orderId}).limit(1).update({order_status: parseInt(orderStatus)});
+  }
+   //发货通知
+    async sendmsg(openid,orderInfo) {
+        //获取access_token
+        const options = {
+            method: 'GET',
+            url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + think.config('weixin.appid') + '&secret=' + think.config('weixin.secret'),
+        };
+        let sessionData = await rp(options);
+        var access_token = JSON.parse(sessionData).access_token;
+        think.logger.info('orderInfo'+orderInfo)
+        const optionstemplate = {
+            method: 'POST',
+              json: true,
+            url: 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' + access_token,
+            body: {
+                "touser": openid,
+                "template_id": "5X0pQf7S8hMoXmfplROkkoBWVTuO5e-iAK-9MI8-D6o",
+                "page":'/pages/ucenter/orderDetail/orderDetail?id='+orderInfo.id,
+                "form_id":orderInfo.prepay_id,
+                "data": {
+                    "keyword1": {
+                         "value": '订单派送中...',
+                        "color": "#173177"
+                    },
+                   "keyword2": {
+                    "value": orderInfo.order_sn,
+                       
+                        "color": "#173177"
+                    },
+                    "keyword3": {
+                        "value": moment.unix(Math.round(new Date() / 1000)).format('YYYY-MM-DD HH:mm:ss'),
+                        "color": "#173177"
+                    },
+                    "keyword4": {
+                        "value":'配送到房间',
+                        "color": "#173177"
+                    },
+                    
+                    "keyword5": {
+                        "value":moment.unix(orderInfo.add_time).format('YYYY-MM-DD HH:mm:ss'),
+                        "color": "#173177"
+                    },
+                    "keyword6": {
+                        "value":'0755-33225958',
+                        "color": "#173177"
+                    }
+                }
+                
+            }
+        };
+        let templateData = await rp(optionstemplate);
+        return templateData
+    }
 };

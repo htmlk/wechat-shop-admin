@@ -44,12 +44,25 @@ module.exports = class extends Base {
     }
     return this.success(values);
   }
+  //商品上下架
+  async updateGoodsAction(){
+     const goodid = this.get('goodid');
+     const isonsale= this.get('isonsale');
+    var data=await this.model('goods').where({id: goodid}).limit(1).update({is_on_sale: isonsale});
+    return this.success(data);
+  }
+  //是否主页显示
+   async updateishotAction(){
+     const goodid = this.get('goodid');
+     const ishot= this.get('ishot');
+    var data=await this.model('goods').where({id: goodid}).limit(1).update({is_hot: ishot});
+    return this.success(data);
+  }
 
   async destoryAction() {
     const id = this.post('id');
     await this.model('goods').where({id: id}).limit(1).delete();
     // TODO 删除图片
-
     return this.success();
   }
 };

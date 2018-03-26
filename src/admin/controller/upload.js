@@ -1,6 +1,5 @@
 const Base = require('./base.js');
 const fs = require('fs');
-
 module.exports = class extends Base {
   async brandPicAction() {
     const brandFile = this.file('brand_pic');
@@ -15,7 +14,7 @@ module.exports = class extends Base {
 
     return that.success({
       name: 'brand_pic',
-      fileUrl: 'https:/www.htmlk.cn' + filename
+      fileUrl: think.config('baseUrl') + filename
     });
   }
 
@@ -33,7 +32,7 @@ module.exports = class extends Base {
 
     return that.success({
       name: 'brand_new_pic',
-      fileUrl: 'https:/www.htmlk.cn' + filename
+      fileUrl: think.config('baseUrl') + filename
     });
   }
 
@@ -51,7 +50,7 @@ module.exports = class extends Base {
 
     return that.success({
       name: 'wap_banner_url',
-      fileUrl: 'https:/www.htmlk.cn' + filename
+      fileUrl: think.config('baseUrl') + filename
     });
   }
 
@@ -69,7 +68,7 @@ module.exports = class extends Base {
 
     return that.success({
       name: 'scene_pic_url',
-      fileUrl: 'https:/www.htmlk.cn' + filename
+      fileUrl: think.config('baseUrl') + filename
     });
   }
 };

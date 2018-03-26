@@ -2,12 +2,17 @@ const Base = require('./base.js');
 const moment = require('moment');
 
 module.exports = class extends Base {
+
+  async indexAction(){
+   var data=await this.model('order').sendmsg();
+   return this.success(data);
+  }
   /**
    * 获取订单列表
    * @return {Promise} []
    */
   async listAction() {
-    const orderList = await this.model('order').where({ user_id: think.userId }).page(1, 10).countSelect();
+    const orderList = await this.model('order').where({ user_id: think.userId }).order(['id DESC']).page(1, 10).countSelect();
     const newOrderList = [];
     for (const item of orderList.data) {
       // 订单的商品
@@ -186,7 +191,6 @@ module.exports = class extends Base {
 
     await this.model('order_goods').addMany(orderGoodsData);
     await this.model('cart').clearBuyGoods();
-
     return this.success({ orderInfo: orderInfo });
   }
 
