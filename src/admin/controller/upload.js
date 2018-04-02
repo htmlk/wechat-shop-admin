@@ -1,6 +1,62 @@
 const Base = require('./base.js');
 const fs = require('fs');
 module.exports = class extends Base {
+
+
+
+  async goodsPicAction() {
+    const goodsFile = this.file('goods_Pic');
+    if (think.isEmpty(goodsFile)) {
+      return this.fail('保存失败');
+    }
+    const that = this;
+    const filename = '/static/upload/goods/' + think.uuid(32) + '.jpg';
+    const is = fs.createReadStream(goodsFile.path);
+    const os = fs.createWriteStream(think.ROOT_PATH + '/www' + filename);
+    is.pipe(os);
+
+    return that.success({
+      name: 'goods_Pic',
+      fileUrl: think.config('baseUrl') + filename
+    });
+  }
+
+   async listPicAction() {
+    const goodsFile = this.file('list_Pic');
+    if (think.isEmpty(goodsFile)) {
+      return this.fail('保存失败');
+    }
+    const that = this;
+    const filename = '/static/upload/list/' + think.uuid(32) + '.jpg';
+    const is = fs.createReadStream(goodsFile.path);
+    const os = fs.createWriteStream(think.ROOT_PATH + '/www' + filename);
+    is.pipe(os);
+
+    return that.success({
+      name: 'list_Pic',
+      fileUrl: think.config('baseUrl') + filename
+    });
+  }
+
+
+ async qrcodePicAction() {
+    const goodsFile = this.file('qrcode_Pic');
+    if (think.isEmpty(goodsFile)) {
+      return this.fail('保存失败');
+    }
+    const that = this;
+    const filename = '/static/upload/qrcode/' + think.uuid(32) + '.jpg';
+    const is = fs.createReadStream(goodsFile.path);
+    const os = fs.createWriteStream(think.ROOT_PATH + '/www' + filename);
+    is.pipe(os);
+
+    return that.success({
+      name: 'qrcode_Pic',
+      fileUrl: think.config('baseUrl') + filename
+    });
+  }
+
+
   async brandPicAction() {
     const brandFile = this.file('brand_pic');
     if (think.isEmpty(brandFile)) {

@@ -125,7 +125,7 @@ module.exports = class extends think.Model {
             body: {
                 "touser": openid,
                 "template_id": "PRN-5fDYP7FtFbdiJo1j74CXMAspDON-h8BIR_qx7qY",
-                "page":'/pages/ucenter/orderDetail/orderDetail?id='+orderInfo.id,
+                "page":'pages/ucenter/orderDetail/orderDetail?id='+orderInfo.id,
                 "form_id":orderInfo.prepay_id,
                 "data": {
                     "keyword1": {

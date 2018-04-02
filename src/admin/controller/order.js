@@ -10,9 +10,12 @@ module.exports = class extends Base {
     const size = this.get('size') || 10;
     const orderSn = this.get('orderSn') || '';
     const consignee = this.get('consignee') || '';
-
+    const  starttime=this.get('starttime') || 0;
+    const  endtime=this.get('endtime') ||999999999999999;
+    const  orderstatus=this.get('orderstatus') ||'';
+    think.logger.info(orderstatus)
     const model = this.model('order');
-    const data = await model.where({order_sn: ['like', `%${orderSn}%`], consignee: ['like', `%${consignee}%`]}).order(['id DESC']).page(page, size).countSelect();
+    const data = await model.where({order_sn: ['like', `%${orderSn}%`],order_status:['like', `${orderstatus}%`], consignee: ['like', `%${consignee}%`],add_time: {'>': starttime,'<': endtime}}).order(['id DESC']).page(page, size).countSelect();
     const newList = [];
     for (const item of data.data) {
       item.order_status_text = await this.model('order').getOrderStatusText(item.id);

@@ -22,9 +22,6 @@ module.exports = class extends Base {
     const WeixinSerivce = this.service('weixin', 'api');
     console.log(openid)
     console.log(orderInfo)
-    
-     
- 
       const returnParams = await WeixinSerivce.createUnifiedOrder({
         openid: openid,
         orderId:orderId,
