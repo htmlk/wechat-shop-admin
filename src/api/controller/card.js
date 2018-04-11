@@ -1,53 +1,70 @@
 const Base = require('./base.js');
-var wxCard = require("wechat-card");
-
 
 module.exports = class extends Base {
+    //领取卡券
     async indexAction() {
-        var _that = this
+
         const user_id = this.get('userid');
+        const cardid=this.get('cardid');
         const openid = await this.model('user').where({ id: user_id }).getField('weixin_openid', true);
-        var timestamp = new Date().getTime()
-        var cardid = 'pzTUOwhO5LftlcWxMHtmIMixlWeE'
-        var data = [timestamp, '', cardid]
+        var timestamp = Math.round(new Date() / 1000);
+       
 
-        wxCard.basic.getApiTicket(function(err, ticket) {
-            // do something ...
-            data[1] = ticket
-            think.logger.info(data)
-            var signature = wxCard.basic.getSignatureSync(data);
-            think.logger.info(signature)
-        });
+        const cardSerivce = think.service('weixin', 'api');
+        var ticket = await cardSerivce.getApiTicket();
+        var signature = await cardSerivce.getSignature(ticket, cardid, timestamp)
 
-        _that.success(signature)
+        return this.success({
+            signature: signature,
+            timestamp: timestamp
+        })
     }
+    //添加卡券领取记录
+    async addcardAction() {
+        const cardSerivce = think.service('weixin', 'api');
+        var code = await cardSerivce.encryptCode(this.post('code'));
+        const data = {
+            userid: this.post('userid'),
+            cardExt: this.post('cardExt'),
+            cardId: this.post('cardId'),
+            code: code,
+            isSuccess: this.post('isSuccess') ? 1 : 0,
+            isCode: 1,
+            addtime:Math.round(new Date() / 1000)
+        }
+        var addcard = await this.model('weixin_add_card').add(data)
+        return this.success(addcard)
+    }
+    //已经添加的卡券列表
+    async cardlistAction() {
 
+        const page = this.get('page') || 1
+        const size = this.get('size') || 10
+        const userid = this.get('userid') || ''
+        const cardSerivce = think.service('weixin', 'api');
+        var cardData = await this.model('weixin_add_card').where({ userid: userid,isCode:1 }).page(page, size).countSelect();
+
+        for (var i = 0; i < cardData.data.length; i++) {
+            think.logger.info(cardData.data[i].cardId)
+            var cardinfo = await cardSerivce.cardinfo(cardData.data[i].cardId);
+            cardData.data[i].cardinfo = cardinfo
+        }
+
+
+        return this.success(cardData)
+    }
+    //获取卡券密码
+    async cardpwdAction(){
+       const list=await this.model('weixin_card_list').countSelect()
+       return this.success(list)
+    }
+    //卡券code解密
     async codeAction() {
-        var code = "737292986196";
-        wxCard.setConfig({
-            //appId: think.config('weixin.appid'),
-            //appSecret: think.config('weixin.secret')
-            appId: 'wxa3b51bfa3764bd04',
-            appSecret: '0a8262ae1b70bc931f8d70301c7e650b'
-
-            // 或者配置其他提供access token的服务
-            // accessTokenService: "http://url"
-        });
-        wxCard.basic.getAccessToken(function(err, accessToken) {
-            think.logger.info(accessToken)
-            think.logger.info(err)
-            // do something ...
-        });
-        wxCard.code.getCodeDetail(code, function(err, details) {
-            // do something ...
-            think.logger.info(details)
-             think.logger.info(err)
-        });
-
-          wxCard.code.consumeCode(code, function(err, consumeInfo) {
-             think.logger.info(consumeInfo)
-            // do something ...
-          });
-
+        const code = this.get('code');
+        const cardSerivce = think.service('weixin', 'api');
+        var codeData = await cardSerivce.encryptCode(code);
+        return this.success({
+            codeData: codeData
+        })
     }
 };

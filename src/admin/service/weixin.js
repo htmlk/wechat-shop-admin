@@ -27,36 +27,45 @@ module.exports = class extends think.Service {
         return sessionData
     }
     //查看卡券信息
-    async cardinfo(cardId){
-          think.logger.info(cardId)
-          return new Promise((resolve, reject) => {
+    async cardinfo(cardId) {
 
+        return new Promise((resolve, reject) => {
             wxCard.card.getCardDetail(cardId.cardId, function(err, card) {
-       
-                think.logger.info(card)
-               
-                      resolve(card)
-               
+                resolve(card)
             });
+        })
+    }
+    //查看卡券列表
+    async cardlist(page=0, size=10) {
 
+        return new Promise((resolve, reject) => {
+            wxCard.card.getCardIdList(page, size, function(err, ids) {
+                think.logger.info(ids)
+                resolve(ids)
+            });
         })
     }
     //核销code
     async consumeCode(data) {
-        var _that=this
+        var _that = this
         return new Promise((resolve, reject) => {
 
             wxCard.code.consumeCode(data.code, function(err, consumeInfo) {
-                if(consumeInfo){
+                if (consumeInfo) {
                     _that.model('weixin_card').add({
-                        card_id:consumeInfo.card_id,
-                        open_id:consumeInfo.openid,
-                        code:data.code,
-                        addtime:parseInt(new Date().getTime())
+                        card_id: consumeInfo.card_id,
+                        open_id: consumeInfo.openid,
+                        code: data.code,
+                        addtime: parseInt(new Date().getTime())
                     })
-                      resolve(consumeInfo)
-                }else{
-                      resolve(err)
+                    _that.model('weixin_add_card').where({code:data.code}).update({isCode:0})
+                    consumeInfo.code=0
+                    consumeInfo.msgtext='核销成功'
+                    resolve(consumeInfo)
+                } else {
+
+                    err.msgtext='核销失败'
+                    resolve(err)
                 }
             });
 

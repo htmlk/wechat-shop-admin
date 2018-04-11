@@ -61,3 +61,21 @@ exports.logger = {
     filename: path.join(think.ROOT_PATH, 'logs/app.log')
   }
 };
+
+//socketio
+const ws = require('think-websocket-ws');
+exports.websocket = {
+  type: 'ws',
+  common: {
+    // common config
+  },
+  ws: {
+    handle: ws,
+    path: '/ws',
+    messages: [{
+      close: '/ws/close',
+      open: '/ws/open',
+      addUser: '/ws/addUser'
+    }]
+  }
+}

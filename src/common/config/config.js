@@ -11,6 +11,7 @@ const app = (callback, port, host, think) => {
   return server;
 }
 module.exports = {
+  stickyCluster: true,
   createServer: app,
   default_module: 'api',
   port: 443,
