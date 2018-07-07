@@ -56,7 +56,7 @@ module.exports = class extends think.Service {
                         card_id: consumeInfo.card_id,
                         open_id: consumeInfo.openid,
                         code: data.code,
-                        addtime: parseInt(new Date().getTime())
+                        addtime: Math.round(new Date() / 1000)
                     })
                     _that.model('weixin_add_card').where({code:data.code}).update({isCode:0})
                     consumeInfo.code=0

@@ -26,7 +26,7 @@ module.exports = class extends Base {
   }
 async detailAction() {
     const orderId = this.get('orderId');
-     const userId = this.get('userId');
+     const userId = this.get('userId')||'';
     const orderInfo = await this.model('order').where({ user_id:userId, id: orderId }).find();
 
     if (think.isEmpty(orderInfo)) {

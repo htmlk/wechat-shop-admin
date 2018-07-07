@@ -1,12 +1,12 @@
 const Base = require('./base.js');
 
-module.exports = class extends Base {
+module.exports = class extends  think.Controller {
     //领取卡券
     async indexAction() {
 
-        const user_id = this.get('userid');
+        //const user_id = this.get('userid');
         const cardid=this.get('cardid');
-        const openid = await this.model('user').where({ id: user_id }).getField('weixin_openid', true);
+       // const openid = await this.model('user').where({ id: user_id }).getField('weixin_openid', true);
         var timestamp = Math.round(new Date() / 1000);
        
 
@@ -25,6 +25,7 @@ module.exports = class extends Base {
         var code = await cardSerivce.encryptCode(this.post('code'));
         const data = {
             userid: this.post('userid'),
+            openid:this.post('openid'),
             cardExt: this.post('cardExt'),
             cardId: this.post('cardId'),
             code: code,
@@ -41,6 +42,20 @@ module.exports = class extends Base {
         const page = this.get('page') || 1
         const size = this.get('size') || 10
         const userid = this.get('userid') || ''
+        if (think.isEmpty(userid)) {
+             const openid = this.get('openid') || ''
+             const cardSerivce = think.service('weixin', 'api');
+            var cardData = await this.model('weixin_add_card').where({ openid: openid,isCode:1 }).page(page, size).countSelect();
+
+            for (var i = 0; i < cardData.data.length; i++) {
+                think.logger.info(cardData.data[i].cardId)
+                var cardinfo = await cardSerivce.cardinfo(cardData.data[i].cardId);
+                cardData.data[i].cardinfo = cardinfo
+            }
+            return this.success(cardData)
+  
+        }
+
         const cardSerivce = think.service('weixin', 'api');
         var cardData = await this.model('weixin_add_card').where({ userid: userid,isCode:1 }).page(page, size).countSelect();
 

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const md5 = require('md5');
 var wxCard = require("wechat-card");
+const rp = require('request-promise');
 module.exports = class extends think.Service {
     /**
      * 解析微信登录用户数据
@@ -157,7 +158,7 @@ module.exports = class extends think.Service {
         })
     }
     //查看卡券信息
-     cardinfo(cardId) {
+    cardinfo(cardId) {
 
         return new Promise((resolve, reject) => {
             wxCard.card.getCardDetail(cardId, function(err, card) {
@@ -174,5 +175,51 @@ module.exports = class extends think.Service {
             });
         })
     }
+
+    //发送消息
+    accesstoken() {
+        return new Promise((resolve, reject) => {
+            // 获取
+            const options = {
+                method: 'GET',
+                url: 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + think.config('weixin.appid') + '&secret=' + think.config('weixin.secret'),
+            };
+            var sessionData = rp(options);
+            resolve(sessionData)
+        })
+    }
+
+    sendMsg(access_token,touser,msgtype,content) {
+        // 获取
+       
+        return new Promise((resolve, reject) => {
+            var options = {
+                method: 'POST',
+                url: 'https://api.weixin.qq.com/cgi-bin/message/custom/send',
+                qs: { access_token: access_token },
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Content-Type': 'application/json'
+                },
+                body: {
+                    touser: touser,
+                    msgtype: msgtype,
+                    image: {
+                        media_id: content
+                    },
+                    text: { content:content }
+                },
+                json: true
+            };
+
+            rp(options, function(error, response, body) {
+               // if (error) throw new Error(error);
+                resolve(body)
+            });
+
+
+        })
+    }
+
 
 };

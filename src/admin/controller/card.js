@@ -10,7 +10,28 @@ module.exports = class extends think.Controller {
 
     //创建卡券
     async addCardAction() {
+            var card = {
+                card_type: "DISCOUNT",
+                base_info: {
+                  // ...
+                },
+                special_info: {
+                  // ...
+                }
+              };
 
+              wxCard.card.createCard(card, function(err, cardId) {
+                // do something ...
+              });
+
+
+    }
+    //领取列表
+    async receivecardAction(){
+        const page = this.get('page') || 0
+        const size = this.get('size') || 10
+        const receivecard=await this.model('weixin_add_card').page(page, size).countSelect();
+        return this.success(receivecard)
     }
     //获取卡券信息
     async cardInfoAction() {
@@ -50,25 +71,13 @@ module.exports = class extends think.Controller {
     async cardEditAction() {
         // 下面的cardid仅用于demo，实际中不存在
         var card = {
-            card_id: "pzTUOwre_kmkKAvNkzsyM37TteAE",
+            card_id: "pzTUOwn8m-06AcC-HZ8NsKUf8Fgw",
+
             base_info: {
-                "custom_url_name": "立即使用",
-
-                "custom_url": "https://yijian.hk",
-
-                "custom_app_brand_user_name": "gh_d240281bb749@app",
-
-                "custom_app_brand_pass": "pages/index/index",
-
-                "custom_url_sub_title": "查看逸住商城",
-
-                "promotion_url_name": "更多优惠",
-
-                "promotion_url": "https://yijian.hk",
-
-                "promotion_app_brand_user_name": "gh_d240281bb749@app",
-
-                "promotion_app_brand_pass": "pages/index/index"
+               "center_title": "立即核销",
+              "center_sub_title": "一间自助机核销",
+              "center_url": "yijian.hk",
+                   
             }
         };
 
